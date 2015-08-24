@@ -14,6 +14,9 @@ function ViewGroup3D(workspace, div) {
         antialias: true,
         canvas: this._canvas,
     });
+    this._effect = new THREE.AnaglyphEffect(this._renderer);
+    this._enableAnaglyphMode = false;
+
     this._width = 0;
     this._height = 0;
     this._left = 0;
@@ -44,6 +47,17 @@ ViewGroup3D.prototype = Object.create(null, {
         }
     },
 
+    enableAnaglyphMode: {
+        get: function() {
+            return this._enableAnaglyphMode;
+        },
+
+        set: function(value) {
+            this._enableAnaglyphMode = value;
+            this.requestAnimationFrame();
+        }
+    },
+
     _renderTo: {
         value: function(renderer, scene) {
             renderer.setClearColor(scene.backgroundColorValue);
@@ -54,7 +68,7 @@ ViewGroup3D.prototype = Object.create(null, {
                 renderer.setViewport(v.left, viewportBottom, v.width, v.height);
                 renderer.setScissor(v.left, viewportBottom, v.width, v.height);
                 renderer.enableScissorTest(true);
-                scene.render(renderer, v.camera);
+                scene.render(this.enableAnaglyphMode ? this._effect : renderer, v.camera);
             }
         }
     },
@@ -90,6 +104,7 @@ ViewGroup3D.prototype = Object.create(null, {
             // Make sure view looks good with zoom and on retina.
             this._renderer.setPixelRatio(this._pixelRatio);
             this._renderer.setSize(this._width, this._height);
+            this._effect.setSize(this._width, this._height);
 
             for (var i = 0; i < this._views.length; i++) {
                 this._views[i].finishUpdateLayout();

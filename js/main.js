@@ -132,6 +132,7 @@ function initGUI() {
     }).name('Layout');
     f3d.addColor(g_workspace.scene3d, 'color').name('Color');
     f3d.addColor(g_workspace.scene3d, 'backgroundColor').name('Background');
+    f3d.add(g_views.g3d, 'enableAnaglyphMode').name('Enable anaglyph mode');
     f3d.add(g_workspace.scene3d.frontLight, 'intensity', 0, 3).name('Light');
     f3d.add(g_workspace.scene3d, 'spotBorder', 0, 1).name('Spot border').step(0.01);
     f3d.add(g_views, 'exportPixelRatio3d', [0.5, 1.0, 2.0, 4.0]).name('Export pixel ratio');

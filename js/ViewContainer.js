@@ -111,7 +111,7 @@ ViewContainer.prototype = Object.create(null, {
 
         set: function(value) {
             if (value <= 0.0 || value > 4.0) {
-                throw 'Invalud value range';
+                throw 'Invalid value range';
             }
             this._exportPixelRatio3d = value;
         }
