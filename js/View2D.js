@@ -137,7 +137,7 @@ View2D.prototype = Object.create(null, {
             for (var i = 0; i < spotsCount; i++) {
                 var s = spots[i];
                 colorMap.map(color, s.intensity);
-                function setPoint(index, dx, dy) {
+                var setPoint = function(index, dx, dy) {
                     var idx = i * 6 + index;
                     positions[idx * 3 + 0] = s.x + s.r * dx;
                     positions[idx * 3 + 1] = s.y + s.r * dy;

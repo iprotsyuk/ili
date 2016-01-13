@@ -73,13 +73,13 @@ THREE.VRControls = function ( object, onError ) {
 
 			var state = vrInput.getState();
 
-			if ( state.orientation !== null ) {
+			if ( state.hasOrientation ) {
 
 				object.quaternion.copy( state.orientation );
 
 			}
 
-			if ( state.position !== null ) {
+			if ( state.hasPosition ) {
 
 				object.position.copy( state.position ).multiplyScalar( scope.scale );
 

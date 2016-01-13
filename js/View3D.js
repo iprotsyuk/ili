@@ -8,6 +8,7 @@
  * @param {ViewGroup3D} droup.
  * @param {HTMLDivElement} div.
  */
+
 function View3D(group, div) {
     this._group = group;
     this._div = div;
@@ -17,20 +18,34 @@ function View3D(group, div) {
     this._height = 0;
     this._autorotation = 0;
     this._autorotationStart = undefined;
-    this._camera = new THREE.PerspectiveCamera(45, 1, 0.1, 1000);
+    this._camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0, 1000);
     this._camera.position.x = -30;
     this._camera.position.y = 40;
     this._camera.position.z = 30;
     this._camera.lookAt(this._group._scene.position);
 
-    this._div.addEventListener('dblclick', this._onDoubleClick.bind(this));
+    var camera = this._camera;
+    /*
+     Handle window resizes
+     */
+    var onWindowResize = function() {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+    }
+    window.addEventListener( 'resize', onWindowResize, false );
 
-    this._controls = new THREE.OrbitControls(this._camera, this._div);
+/*    this._vrControls = new THREE.VRControls(this._camera, function(message){
+        console.log(message);
+    });*/
+
+    //this._div.addEventListener('dblclick', this._onDoubleClick.bind(this));
+
+/*    this._controls = new THREE.OrbitControls(this._camera, this._div);
     this._controls.target = this._group._scene.position;
     this._controls.noKeys = true;
     this._controls.update();
-    this._controls.addEventListener('change', group.requestAnimationFrame.bind(group));
-    this._controls.addEventListener('start', this._onOrbitStart.bind(this));
+    //this._controls.addEventListener('change', group.requestAnimationFrame.bind(group));
+    this._controls.addEventListener('start', this._onOrbitStart.bind(this));*/
 }
 
 View3D.prototype = Object.create(null, {
@@ -113,14 +128,13 @@ View3D.prototype = Object.create(null, {
         value: function(now) {
             if (this._autorotation == 0.0) {
                 return;
-            } else {
-                this._group.requestAnimationFrame();
             }
+            this._group.requestAnimationFrame();
             var timeDelta = now - this._autorotationStart;
 
             var angle = timeDelta * this._autorotation / 1000;
-            if (!isNaN(angle)) this._controls.rotateLeft(angle);
-            this._controls.update();
+            //if (!isNaN(angle)) this._controls.rotateLeft(angle);
+            //this._controls.update();
 
             this._autorotationStart = now;
         }

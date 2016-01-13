@@ -1,3 +1,23 @@
+var xPos,yPos,zPos;
+var xOrient,yOrient,zOrient;
+var gHMD, gPositionSensor;
+
+function setView() {
+    var posState = gPositionSensor.getState();
+    if(posState.hasPosition) {
+        xPos = posState.position.x * 10;
+        yPos = posState.position.y * 10;
+        zPos =  3 - (-posState.position.z * 10);
+    }
+
+    if(posState.hasOrientation) {
+        xOrient = (-posState.orientation.x * 180 / Math.PI)/10;
+        yOrient = (posState.orientation.y * 180 / Math.PI)/10;
+        zOrient = (posState.orientation.z * 180 / Math.PI)/10;
+    }
+
+}
+
 function Scene3D() {
     EventSource.call(this, Scene3D.Events);
 
@@ -22,9 +42,27 @@ function Scene3D() {
     this._spots = null;
     this._mapping = null;
 
-    this._scene.add(new THREE.AxisHelper(20));
+    //this._scene.add(new THREE.AxisHelper(20));
     this._scene.add(this._meshContainer);
     this._scene.add(this._frontLight);
+
+    navigator.getVRDevices().then(function(devices) {
+        for (var i = 0; i < devices.length; ++i) {
+            if (devices[i] instanceof HMDVRDevice) {
+                gHMD = devices[i];
+                break;
+            }
+        }
+
+        if (gHMD) {
+            for (var i = 0; i < devices.length; ++i) {
+                if (devices[i] instanceof PositionSensorVRDevice && devices[i].hardwareUnitId === gHMD.hardwareUnitId) {
+                    gPositionSensor = devices[i];
+                    break;
+                }
+            }
+        }
+    });
 };
 
 Scene3D.Events = {
@@ -33,7 +71,7 @@ Scene3D.Events = {
 
 Scene3D._makeLightProperty = function(field) {
     return Scene3D._makeProxyProperty(field, ['intensity'], function() {
-        this._notify(Scene3D.Events.CHANGE);
+        //this._notify(Scene3D.Events.CHANGE);
     });
 };
 
@@ -148,7 +186,7 @@ Scene3D.prototype = Object.create(EventSource.prototype, {
             function() {
         if (this._mesh) {
             this._applyAdjustment();
-            this._notify(Scene3D.Events.CHANGE);
+            //this._notify(Scene3D.Events.CHANGE);
         }
     }),
 
@@ -205,7 +243,7 @@ Scene3D.prototype = Object.create(EventSource.prototype, {
         },
 
         set: function(value) {
-            if (!this._spots) throw "Mapping donesn't make sense without spots";
+            if (!this._spots) throw "Mapping doesn't make sense without spots";
             this._mapping = value;
             if (this._mesh) {
                 this._recolor();
@@ -259,6 +297,22 @@ Scene3D.prototype = Object.create(EventSource.prototype, {
 
     render: {
         value: function(renderer, camera) {
+            if (this._scene.children.indexOf(camera) == -1) {
+                this._scene.add(camera);
+            }
+            setView();
+
+            //camera.position.set(xPos, yPos, zPos);
+            camera.position.x = xPos;
+            camera.position.y = yPos;
+            camera.position.z = zPos;
+
+            //camera.rotation.set(xOrient, -yOrient, zOrient);
+
+            camera.rotation.x = xOrient;
+            camera.rotation.y = -yOrient;
+            camera.rotation.z = zOrient;
+
             this._frontLight.position.set(camera.position.x, camera.position.y, camera.position.z);
             renderer.render(this._scene, camera);
         }

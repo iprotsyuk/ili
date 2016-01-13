@@ -157,7 +157,9 @@ MapSelector.prototype = Object.create(null, {
             if (prev) prev.removeAttribute('selected');
             if (value) {
                 value.setAttribute('selected', '');
-                value.scrollIntoViewIfNeeded();
+                if (navigator.userAgent.toLowerCase().indexOf('chrome') > -1) {
+                    value.scrollIntoViewIfNeeded();
+                }
                 this._selectIndex(Number(value.getAttribute('index')));
             }
         }

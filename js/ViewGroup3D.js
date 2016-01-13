@@ -7,6 +7,7 @@
  * @param {HTMLDivElement} div Container element with a canvas and
  *                             several .View3D elements.
  */
+
 function ViewGroup3D(workspace, div) {
     this._div = div;
     this._canvas = div.querySelector('canvas');
@@ -27,6 +28,20 @@ function ViewGroup3D(workspace, div) {
 
     this._div.addEventListener('mousedown', this._onMouseDown.bind(this));
 
+    this._effect = new THREE.VREffect(this._renderer, function(message){
+        console.log(message);
+    });
+    this._effect.setSize( window.innerWidth, window.innerHeight );
+
+    var effect = this._effect;
+    document.body.addEventListener( 'dblclick', function() {
+        effect.setFullScreen( true );
+    });
+    var onWindowResize = function() {
+        effect.setSize( window.innerWidth, window.innerHeight );
+    }
+    window.addEventListener( 'resize', onWindowResize, false );
+
     var divs = this._div.querySelectorAll('.View3d');
     for (var i = 0; i < divs.length; i++) {
         this._views.push(new View3D(this, divs[i]));
@@ -45,16 +60,18 @@ ViewGroup3D.prototype = Object.create(null, {
     },
 
     _renderTo: {
-        value: function(renderer, scene) {
+        value: function(renderer, effect, scene) {
             renderer.setClearColor(scene.backgroundColorValue);
             for (var i = 0; i < this._views.length; i++) {
                 var v = this._views[i];
-                if (!v.width || !v.height) continue;
-                var viewportBottom = this._height - v.top - v.height;
-                renderer.setViewport(v.left, viewportBottom, v.width, v.height);
-                renderer.setScissor(v.left, viewportBottom, v.width, v.height);
-                renderer.enableScissorTest(true);
-                scene.render(renderer, v.camera);
+                if (v.width && v.height) {
+/*                    var viewportBottom = this._height - v.top - v.height;
+                    renderer.setViewport(v.left, viewportBottom, v.width, v.height);
+                    renderer.setScissor(v.left, viewportBottom, v.width, v.height);
+                    renderer.enableScissorTest(true);*/
+                    //v._vrControls.update();
+                    scene.render(effect, v.camera);
+                }
             }
         }
     },
@@ -94,8 +111,6 @@ ViewGroup3D.prototype = Object.create(null, {
             for (var i = 0; i < this._views.length; i++) {
                 this._views[i].finishUpdateLayout();
             }
-
-            this.requestAnimationFrame();
         }
     },
 
@@ -142,8 +157,10 @@ ViewGroup3D.prototype = Object.create(null, {
             for (var i = 0; i < this._views.length; i++) {
                 this._views[i].onAnimationFrame(now);
             }
-            this._renderTo(this._renderer, this._scene);
+            this._renderTo(this._renderer, this._effect, this._scene);
             this._spotLabel.update();
+
+            requestAnimationFrame(this._onAnimationFrame.bind(this, now));
         }
     },
 
