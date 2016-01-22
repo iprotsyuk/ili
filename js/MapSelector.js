@@ -23,7 +23,7 @@ function MapSelector(workspace, div, mapName) {
             'intensities-change', this._onWorkspaceIntencitiesChange.bind(this));
     this._input.addEventListener('input', this._onInput.bind(this));
     this._input.addEventListener('blur', this._onBlur.bind(this));
-    this._input.addEventListener('keydown', this._onKeyDown.bind(this), false);
+    this._input.addEventListener('keypress', this._onKeyPress.bind(this), false);
     this._itemsContainer.addEventListener(
             'mousedown', this._onItemMouseDown.bind(this), false);
     this._itemsContainer.addEventListener('click', this._onItemClick.bind(this), false);
@@ -202,16 +202,16 @@ MapSelector.prototype = Object.create(null, {
         }
     },
 
-    _onKeyDown: {
+    _onKeyPress: {
         value: function(event) {
             if (event.ctrlKey || event.ctrlKey || event.metaKey) return;
 
-            switch (event.keyIdentifier) {
-                case 'Up':
+            switch (event.key) {
+                case 'ArrowUp':
                     this.navigate(MapSelector.Direction.UP);
                     break;
 
-                case 'Down':
+                case 'ArrowDown':
                     this.navigate(MapSelector.Direction.DOWN);
                     break;
 
@@ -224,7 +224,7 @@ MapSelector.prototype = Object.create(null, {
                     break;
 
                 case 'Enter':
-                case 'U+001B' /* Escape */:
+                case 'Escape':
                     this.deactivate();
                     break;
 

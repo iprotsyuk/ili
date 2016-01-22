@@ -33,14 +33,12 @@ function ViewGroup3D(workspace, div) {
     });
     this._effect.setSize( window.innerWidth, window.innerHeight );
 
-    var effect = this._effect;
     document.body.addEventListener( 'dblclick', function() {
-        effect.setFullScreen( true );
-    });
-    var onWindowResize = function() {
-        effect.setSize( window.innerWidth, window.innerHeight );
-    }
-    window.addEventListener( 'resize', onWindowResize, false );
+        this._effect.setFullScreen(true);
+    }.bind(this));
+    window.addEventListener('resize', function() {
+        this._effect.setSize(window.innerWidth, window.innerHeight);
+    }.bind(this), false);
 
     var divs = this._div.querySelectorAll('.View3d');
     for (var i = 0; i < divs.length; i++) {
@@ -69,8 +67,25 @@ ViewGroup3D.prototype = Object.create(null, {
                     renderer.setViewport(v.left, viewportBottom, v.width, v.height);
                     renderer.setScissor(v.left, viewportBottom, v.width, v.height);
                     renderer.enableScissorTest(true);*/
-                    //v._vrControls.update();
+                    if (scene._scene.children.indexOf(v.camera) == -1) {
+                        scene._scene.add(v.camera);
+//                        scene._scene.add(v._dollyCam);
+                    }
+
+                    v._vrControls.update();
+//                    v._controls.update();
+
+/*                    var orbitPos = v._camera.position.clone();
+
+                    // Apply the VR HMD camera position and rotation
+                    // on top of the orbited camera.
+                    var rotatedPosition = v._dollyCam.position.applyQuaternion(v._camera.quaternion);
+                    v._camera.position.add(rotatedPosition);
+                    v._camera.quaternion.multiply(v._dollyCam.quaternion);*/
+
                     scene.render(effect, v.camera);
+
+//                    v._camera.position.copy(orbitPos);
                 }
             }
         }

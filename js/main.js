@@ -27,7 +27,7 @@ function init() {
     g_workspace.addEventListener(Workspace.Events.ERRORS_CHANGE,
                                  onWorkspaceErrorsChange);
 
-    document.addEventListener('keydown', onKeyDown, false);
+    document.addEventListener('keypress', onKeyPress, true);
 
     $('#open-button').click(chooseFilesToOpen);
     $('#current-map-label').click(function() {g_mapSelector.activate();});
@@ -47,38 +47,36 @@ function init() {
 }
 
 var KEYBOARD_SHORTCUTS = {
-    'U+004F': chooseFilesToOpen, // Ctrl + O
-    'U+0046': function() { // Ctrl + F
+    'o': chooseFilesToOpen, // Ctrl + O
+    'f': function() { // Ctrl + F
         g_mapSelector.activate();
     },
-    'U+0053': function() { // Ctrl + S
+    's': function() { // Ctrl + S
         var name = g_workspace.mapName || 'image';
         g_views.export().then(function(blob) {
             saveAs(blob, name + '.png');
         });
     },
-    'Up': function() {
+    'ArrowUp': function() {
         g_mapSelector.blink();
         g_mapSelector.navigate(MapSelector.Direction.UP);
     },
-    'Down': function() {
+    'ArrowDown': function() {
         g_mapSelector.blink();
         g_mapSelector.navigate(MapSelector.Direction.DOWN);
     },
 };
 
-function onKeyDown(event) {
-    if ((/^Mac/i).test(navigator.platform)) {
-        if (event.ctrlKey || event.altKey || !event.metaKey) return;
-    } else {
-        if (!event.ctrlKey || event.altKey || event.metaKey) return;
+function onKeyPress(event) {
+    if ((/^Mac/i).test(navigator.platform) && (event.ctrlKey || event.altKey || !event.metaKey) || (!event.ctrlKey || event.altKey || event.metaKey)) {
+        return;
     }
 
-    if (event.keyIdentifier in KEYBOARD_SHORTCUTS) {
-        var handler = KEYBOARD_SHORTCUTS[event.keyIdentifier];
-        handler();
-        event.stopPropagation();
+    if (event.key in KEYBOARD_SHORTCUTS) {
         event.preventDefault();
+        event.stopPropagation();
+        var handler = KEYBOARD_SHORTCUTS[event.key];
+        handler();
     }
 }
 
@@ -142,6 +140,7 @@ function initGUI() {
     adjustment.add(g_workspace.scene3d.adjustment, 'x').name('X offset').step(0.1);
     adjustment.add(g_workspace.scene3d.adjustment, 'y').name('Y offset').step(0.1);
     adjustment.add(g_workspace.scene3d.adjustment, 'z').name('Z offset').step(0.1);
+    adjustment.add(g_views.g3d._views[0]._vrControls, 'scale').name('Oculus Rift scale').step(1);
 
     var fMapping = g_gui.addFolder('Mapping');
     fMapping.add(g_workspace, 'scaleId', {'Linear': Workspace.Scale.LINEAR.id, 'Logarithmic': Workspace.Scale.LOG.id}).name('Scale');

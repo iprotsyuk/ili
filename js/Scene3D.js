@@ -1,23 +1,3 @@
-var xPos,yPos,zPos;
-var xOrient,yOrient,zOrient;
-var gHMD, gPositionSensor;
-
-function setView() {
-    var posState = gPositionSensor.getState();
-    if(posState.hasPosition) {
-        xPos = posState.position.x * 10;
-        yPos = posState.position.y * 10;
-        zPos =  3 - (-posState.position.z * 10);
-    }
-
-    if(posState.hasOrientation) {
-        xOrient = (-posState.orientation.x * 180 / Math.PI)/10;
-        yOrient = (posState.orientation.y * 180 / Math.PI)/10;
-        zOrient = (posState.orientation.z * 180 / Math.PI)/10;
-    }
-
-}
-
 function Scene3D() {
     EventSource.call(this, Scene3D.Events);
 
@@ -38,31 +18,16 @@ function Scene3D() {
     this._spotBorder = 0.05;
     this._colorMap = null;
     this._adjustment = {x: 0, y: 0, z: 0, alpha: 0, beta: 0, gamma: 0};
+    this._autorotation = 0;
 
     this._spots = null;
     this._mapping = null;
 
-    //this._scene.add(new THREE.AxisHelper(20));
+//    this._scene.add(new THREE.AxisHelper(20));
     this._scene.add(this._meshContainer);
     this._scene.add(this._frontLight);
 
-    navigator.getVRDevices().then(function(devices) {
-        for (var i = 0; i < devices.length; ++i) {
-            if (devices[i] instanceof HMDVRDevice) {
-                gHMD = devices[i];
-                break;
-            }
-        }
-
-        if (gHMD) {
-            for (var i = 0; i < devices.length; ++i) {
-                if (devices[i] instanceof PositionSensorVRDevice && devices[i].hardwareUnitId === gHMD.hardwareUnitId) {
-                    gPositionSensor = devices[i];
-                    break;
-                }
-            }
-        }
-    });
+    document.addEventListener('keypress', this.onKeyPress.bind(this), false);
 };
 
 Scene3D.Events = {
@@ -141,7 +106,7 @@ Scene3D.prototype = Object.create(EventSource.prototype, {
             this._color.set(color);
             if (this._mesh) {
                 this._recolor();
-                this._notify(Scene3D.Events.CHANGE);
+//                this._notify(Scene3D.Events.CHANGE);
             }
         }
     },
@@ -155,7 +120,7 @@ Scene3D.prototype = Object.create(EventSource.prototype, {
             var color = new THREE.Color(value);
             if (color.equals(this._backgroundColor)) return;
             this._backgroundColor.set(color);
-            this._notify(Scene3D.Events.CHANGE);
+//            this._notify(Scene3D.Events.CHANGE);
         }
     },
 
@@ -177,7 +142,7 @@ Scene3D.prototype = Object.create(EventSource.prototype, {
             this._spotBorder = value;
             if (this._mesh) {
                 this._recolor();
-                this._notify(Scene3D.Events.CHANGE);
+//                this._notify(Scene3D.Events.CHANGE);
             }
         }
     },
@@ -189,6 +154,21 @@ Scene3D.prototype = Object.create(EventSource.prototype, {
             //this._notify(Scene3D.Events.CHANGE);
         }
     }),
+
+    onKeyPress: {
+        value: function(event) {
+            if (event.key == 'r') {
+                event.preventDefault();
+                event.stopPropagation();
+
+                if (this._autorotation != 0) {
+                    this._autorotation = 0;
+                } else {
+                    this._autorotation = event.ctrlKey ? -1 : 1;
+                }
+            }
+        }
+    },
 
     spots: {
         get: function() {
@@ -217,7 +197,7 @@ Scene3D.prototype = Object.create(EventSource.prototype, {
 
                 if (this._mesh) {
                     this._recolor();
-                    this._notify(Scene3D.Events.CHANGE);
+//                    this._notify(Scene3D.Events.CHANGE);
                 }
             }
         }
@@ -232,7 +212,7 @@ Scene3D.prototype = Object.create(EventSource.prototype, {
             }
             if (this._mesh && this._mapping) {
                 this._recolor();
-                this._notify(Scene3D.Events.CHANGE);
+//                this._notify(Scene3D.Events.CHANGE);
             }
         }
     },
@@ -247,7 +227,7 @@ Scene3D.prototype = Object.create(EventSource.prototype, {
             this._mapping = value;
             if (this._mesh) {
                 this._recolor();
-                this._notify(Scene3D.Events.CHANGE);
+//                this._notify(Scene3D.Events.CHANGE);
             }
         }
     },
@@ -258,8 +238,13 @@ Scene3D.prototype = Object.create(EventSource.prototype, {
         },
 
         set: function(geometry) {
-            if (!this._mesh && !geometry) return;
-            if (this._mesh) this._meshContainer.remove(this._mesh);
+            if (!this._mesh && !geometry) {
+                return;
+            }
+            if (this._mesh) {
+                this._meshContainer.remove(this._mesh);
+//                this._scene.remove(this._mesh);
+            }
             this._mapping = null;
             if (geometry) {
                 geometry.computeBoundingBox();
@@ -268,6 +253,8 @@ Scene3D.prototype = Object.create(EventSource.prototype, {
                 this._meshContainer.add(this._mesh);
                 this._applyAdjustment();
                 this._recolor();
+                this._meshContainer.add(this._mesh);
+//                this._scene.add(this._mesh);
             } else {
                 this._mesh = null;
             }
@@ -284,7 +271,7 @@ Scene3D.prototype = Object.create(EventSource.prototype, {
             this._colorMap = value;
             if (this._mesh && this._spots && this._mapping) {
                 this._recolor();
-                this._notify(Scene3D.Events.CHANGE);
+//                this._notify(Scene3D.Events.CHANGE);
             }
         }
     },
@@ -297,21 +284,8 @@ Scene3D.prototype = Object.create(EventSource.prototype, {
 
     render: {
         value: function(renderer, camera) {
-            if (this._scene.children.indexOf(camera) == -1) {
-                this._scene.add(camera);
-            }
-            setView();
-
-            //camera.position.set(xPos, yPos, zPos);
-            camera.position.x = xPos;
-            camera.position.y = yPos;
-            camera.position.z = zPos;
-
-            //camera.rotation.set(xOrient, -yOrient, zOrient);
-
-            camera.rotation.x = xOrient;
-            camera.rotation.y = -yOrient;
-            camera.rotation.z = zOrient;
+            this._mesh.rotation.z += this._autorotation * 0.005;
+            //this._mesh.rotation.x += this._autorotation * 0.005;
 
             this._frontLight.position.set(camera.position.x, camera.position.y, camera.position.z);
             renderer.render(this._scene, camera);
