@@ -18,10 +18,9 @@ function View3D(group, div) {
     this._height = 0;
     this._autorotation = 0;
     this._autorotationStart = undefined;
-    this._camera = new THREE.PerspectiveCamera(90, 16 / 9/*this._div.offsetWidth / this._div.offsetHeight*/, 0.1, 1000);
-    this._camera.position.x = -30;
-    this._camera.position.y = 40;
-    this._camera.position.z = 30;
+    this._camera = new THREE.PerspectiveCamera(90, this._div.offsetWidth / this._div.offsetHeight, 0.1, 1000);
+    this._cameraOffset = new THREE.Vector3(0, 20, 30);
+    this._camera.position.copy(this._cameraOffset);
     this._camera.lookAt(this._group._scene.position);
 
     /*
@@ -32,12 +31,13 @@ function View3D(group, div) {
     this._vrControls = new THREE.VRControls(this._camera, function(message){
         console.log(message);
     });
+    this._vrControls.scale = 50;
 
     document.addEventListener('keypress', this.onKeyPress.bind(this), false);
 
     //this._div.addEventListener('dblclick', this._onDoubleClick.bind(this));
 
-/*    this._controls = new THREE.OrbitControls(this._dollyCam, this._div);
+/*    this._controls = new THREE.OrbitControls(this._camera, this._div);
 
     this._controls.target.copy(this._group._scene.position);
     this._controls.noKeys = true;
@@ -66,8 +66,8 @@ View3D.prototype = Object.create(null, {
 
     onWindowResize: {
         value: function() {
-/*            this._camera.aspect = this._div.offsetWidth / this._div.offsetHeight;
-            this._camera.updateProjectionMatrix();*/
+            this._camera.aspect = this._div.offsetWidth / this._div.offsetHeight;
+            this._camera.updateProjectionMatrix();
         }
     },
 
@@ -78,6 +78,13 @@ View3D.prototype = Object.create(null, {
                 event.stopPropagation();
                 this._vrControls.resetSensor();
             }
+        }
+    },
+
+    updateCameraPosition: {
+        value: function() {
+            this._vrControls.update();
+            this._camera.position.add(this._cameraOffset);
         }
     },
 

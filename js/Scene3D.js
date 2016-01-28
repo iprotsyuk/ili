@@ -15,6 +15,12 @@ function Scene3D() {
         shading: THREE.SmoothShading
     });
 
+    this._vrLegend = new THREE.Mesh(new THREE.PlaneGeometry(5, 2, 1, 1), new THREE.MeshBasicMaterial());
+
+    this._vrEnabled = false;
+    var fullScreenEventName = navigator.userAgent.toLowerCase().indexOf('firefox') > -1 ? 'mozfullscreenchange' : 'webkitfullscreenchange';
+    document.addEventListener(fullScreenEventName, this.onFullscreenChange.bind(this), false);
+
     this._spotBorder = 0.05;
     this._colorMap = null;
     this._adjustment = {x: 0, y: 0, z: 0, alpha: 0, beta: 0, gamma: 0};
@@ -23,7 +29,6 @@ function Scene3D() {
     this._spots = null;
     this._mapping = null;
 
-//    this._scene.add(new THREE.AxisHelper(20));
     this._scene.add(this._meshContainer);
     this._scene.add(this._frontLight);
 
@@ -108,6 +113,51 @@ Scene3D.prototype = Object.create(EventSource.prototype, {
                 this._recolor();
 //                this._notify(Scene3D.Events.CHANGE);
             }
+        }
+    },
+
+    onFullscreenChange: {
+        value: function(event) {
+            this._vrEnabled = document.mozFullScreenElement !== null && document.mozFullScreenElement !== undefined
+                || document.webkitFullscreenElement !== null && document.webkitFullscreenElement !== undefined;
+            if (this._vrEnabled) {
+                this.updateVrLegend();
+            }
+        }
+    },
+
+    updateVrLegend: {
+        value: function () {
+            // convert legend from svg to png
+            // Source: https://gist.github.com/gustavohenke/9073132
+            var legend = document.querySelector("svg.ViewLegend");
+            // these two attributes below have to be specified explicitly in Firefox
+            legend.setAttribute('width', legend.getBBox().width);
+            legend.setAttribute('height', legend.getBBox().height);
+            var svgData = (new XMLSerializer()).serializeToString(legend);
+
+            var canvas = document.createElement("canvas");
+            canvas.width = legend.getBBox().width;
+            canvas.height = legend.getBBox().height;
+            var ctx = canvas.getContext("2d");
+
+            var img = document.createElement("img");
+            img.setAttribute("src", "data:image/svg+xml;base64," + window.btoa(svgData));
+
+            img.onload = function () {
+                ctx.drawImage(img, 0, 0);
+
+                var texture = new THREE.Texture(canvas);
+                texture.needsUpdate = true;
+                texture.minFilter = THREE.LinearFilter;
+
+                var vrLegendMaterial = new THREE.MeshBasicMaterial({
+                    map: texture,
+                    transparent: true,
+                    opacity: 0.8
+                });
+                this._vrLegend.material = vrLegendMaterial;
+            }.bind(this);
         }
     },
 
@@ -197,6 +247,9 @@ Scene3D.prototype = Object.create(EventSource.prototype, {
 
                 if (this._mesh) {
                     this._recolor();
+                    if (this._vrEnabled) {
+                        this.updateVrLegend();
+                    }
 //                    this._notify(Scene3D.Events.CHANGE);
                 }
             }
@@ -212,6 +265,9 @@ Scene3D.prototype = Object.create(EventSource.prototype, {
             }
             if (this._mesh && this._mapping) {
                 this._recolor();
+                if (this._vrEnabled) {
+                    this.updateVrLegend();
+                }
 //                this._notify(Scene3D.Events.CHANGE);
             }
         }
@@ -243,7 +299,6 @@ Scene3D.prototype = Object.create(EventSource.prototype, {
             }
             if (this._mesh) {
                 this._meshContainer.remove(this._mesh);
-//                this._scene.remove(this._mesh);
             }
             this._mapping = null;
             if (geometry) {
@@ -254,7 +309,6 @@ Scene3D.prototype = Object.create(EventSource.prototype, {
                 this._applyAdjustment();
                 this._recolor();
                 this._meshContainer.add(this._mesh);
-//                this._scene.add(this._mesh);
             } else {
                 this._mesh = null;
             }
@@ -271,6 +325,9 @@ Scene3D.prototype = Object.create(EventSource.prototype, {
             this._colorMap = value;
             if (this._mesh && this._spots && this._mapping) {
                 this._recolor();
+                if (this._vrEnabled) {
+                    this.updateVrLegend();
+                }
 //                this._notify(Scene3D.Events.CHANGE);
             }
         }
@@ -284,8 +341,16 @@ Scene3D.prototype = Object.create(EventSource.prototype, {
 
     render: {
         value: function(renderer, camera) {
-            this._mesh.rotation.z += this._autorotation * 0.005;
-            //this._mesh.rotation.x += this._autorotation * 0.005;
+            this._meshContainer.rotation.z += this._autorotation * 0.005;
+
+            if (this._vrEnabled && camera.children.indexOf(this._vrLegend) == -1) {
+                camera.add(this._vrLegend);
+                this._vrLegend.position.set(-4, -4, -11);
+                this._vrLegend.rotation.x = -0.5;
+                this._vrLegend.rotation.y = 0.5;
+            } else if (!this._vrEnabled && camera.children.indexOf(this._vrLegend) != -1) {
+                camera.remove(this._vrLegend);
+            }
 
             this._frontLight.position.set(camera.position.x, camera.position.y, camera.position.z);
             renderer.render(this._scene, camera);

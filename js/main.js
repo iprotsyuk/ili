@@ -140,7 +140,7 @@ function initGUI() {
     adjustment.add(g_workspace.scene3d.adjustment, 'x').name('X offset').step(0.1);
     adjustment.add(g_workspace.scene3d.adjustment, 'y').name('Y offset').step(0.1);
     adjustment.add(g_workspace.scene3d.adjustment, 'z').name('Z offset').step(0.1);
-    adjustment.add(g_views.g3d._views[0]._vrControls, 'scale').name('Oculus Rift scale').step(1);
+    adjustment.add(g_views.g3d._views[0]._vrControls, 'scale', 0.0001, 1000).name('Oculus Rift scale').step(10);
 
     var fMapping = g_gui.addFolder('Mapping');
     fMapping.add(g_workspace, 'scaleId', {'Linear': Workspace.Scale.LINEAR.id, 'Logarithmic': Workspace.Scale.LOG.id}).name('Scale');
