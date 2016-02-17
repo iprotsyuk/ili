@@ -188,6 +188,7 @@ Workspace.prototype = Object.create(EventSource.prototype, {
                 for (var i = 0; i < result.items.length; i++) {
                     var blob = result.items[i].blob;
                     switch (blob.type) {
+                        case 'application/vnd.ms-excel':
                         case 'text/csv':
                             this.loadIntensities(blob);
                             break;
@@ -574,7 +575,9 @@ Workspace.TaskType.LOAD_IMAGE.worker = Workspace.ImageLoader;
 Workspace.ImageLoader.prototype = {
     terminate: function() {
         this._terminated = true;
-        this._reader.abort();
+        if (this._reader.readyState == 1) {
+            this._reader.abort();
+        }
         if (this._url) {
             URL.revokeObjectURL(this._url);
             this._url = null;

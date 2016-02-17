@@ -7,7 +7,10 @@
 var g_workspace;
 var g_views;
 var g_gui;
+var g_examples;
 var g_mapSelector;
+var g_isWebkit = navigator.userAgent.toLowerCase().indexOf('webkit') > -1;
+var g_keyPressEvent = g_isWebkit ? 'keydown' : 'keypress';
 
 /*
  * On load initialization.
@@ -21,13 +24,14 @@ function init() {
             $('#current-map-label')[0]);
 
     initGUI();
+    g_examples = new Examples();
 
     g_workspace.addEventListener(Workspace.Events.STATUS_CHANGE,
                                  onWorkspaceStatusChange);
     g_workspace.addEventListener(Workspace.Events.ERRORS_CHANGE,
                                  onWorkspaceErrorsChange);
 
-    document.addEventListener('keypress', onKeyPress, true);
+    initKeyboardShortcuts();
 
     $('#open-button').click(chooseFilesToOpen);
     $('#current-map-label').click(function() {g_mapSelector.activate();});
@@ -47,36 +51,48 @@ function init() {
 }
 
 var KEYBOARD_SHORTCUTS = {
-    'o': chooseFilesToOpen, // Ctrl + O
-    'f': function() { // Ctrl + F
-        g_mapSelector.activate();
-    },
-    's': function() { // Ctrl + S
-        var name = g_workspace.mapName || 'image';
-        g_views.export().then(function(blob) {
-            saveAs(blob, name + '.png');
-        });
-    },
-    'ArrowUp': function() {
+    '38': function() { // ArrowUp
         g_mapSelector.blink();
         g_mapSelector.navigate(MapSelector.Direction.UP);
     },
-    'ArrowDown': function() {
+    '40': function() { // ArrowDown
         g_mapSelector.blink();
         g_mapSelector.navigate(MapSelector.Direction.DOWN);
-    },
+    }
 };
 
+function initKeyboardShortcuts() {
+    KEYBOARD_SHORTCUTS[g_isWebkit ? '79' : '111'] = chooseFilesToOpen; // Ctrl + O
+    KEYBOARD_SHORTCUTS[g_isWebkit ? '70' : '102'] = activateMapSelector; // Ctrl + F
+    KEYBOARD_SHORTCUTS[g_isWebkit ? '83' : '115'] = takeSnapshot; // Ctrl + S
+
+    document.addEventListener(g_keyPressEvent, onKeyPress, false);
+}
+
+function activateMapSelector() {
+    g_mapSelector.activate();
+}
+
+function takeSnapshot() {
+    var name = g_workspace.mapName || 'image';
+    g_views.export().then(function(blob) {
+        saveAs(blob, name + '.png', 'image/png');
+    });
+}
+
 function onKeyPress(event) {
-    if ((/^Mac/i).test(navigator.platform) && (event.ctrlKey || event.altKey || !event.metaKey) || (!event.ctrlKey || event.altKey || event.metaKey)) {
-        return;
+    if ((/^Mac/i).test(navigator.platform)) {
+        if (event.ctrlKey || event.altKey || !event.metaKey) return;
+    } else {
+        if (!event.ctrlKey || event.altKey || event.metaKey) return;
     }
 
-    if (event.key in KEYBOARD_SHORTCUTS) {
+    var key = (event.which ? event.which : event.keyCode).toString();
+    if (key in KEYBOARD_SHORTCUTS) {
         event.preventDefault();
-        event.stopPropagation();
-        var handler = KEYBOARD_SHORTCUTS[event.key];
+        var handler = KEYBOARD_SHORTCUTS[key];
         handler();
+        return false;
     }
 }
 
@@ -116,7 +132,6 @@ function clearErrors() {
  */
 function initGUI() {
     g_gui = new dat.GUI();
-
 
     var f2d = g_gui.addFolder('2D');
     f2d.add(g_workspace.scene2d, 'spotBorder', 0, 1).name('Spot border').step(0.01);

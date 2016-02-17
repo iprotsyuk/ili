@@ -45,7 +45,7 @@ function View2D(workspace, div) {
     this._scene.addEventListener(Scene2D.Events.SPOTS_CHANGE,
             this._onSpotsChange.bind(this));
 
-    this._div.addEventListener('mousewheel', this._onMouseWheel.bind(this));
+    this._div.addEventListener('wheel', this._onMouseWheel.bind(this));
     this._div.addEventListener('mousedown', this._onMouseDown.bind(this));
     this._div.addEventListener('dblclick', this._onDblClick.bind(this));
 }
@@ -134,20 +134,22 @@ View2D.prototype = Object.create(null, {
 			var color = new THREE.Color();
 			var colorMap = this._scene.colorMap;
 
+            function setPoint(index, dx, dy) {
+                var idx = i * 6 + index;
+                positions[idx * 3 + 0] = s.x + s.r * dx;
+                positions[idx * 3 + 1] = s.y + s.r * dy;
+                positions[idx * 3 + 2] = 0;
+                uvs[idx * 2 + 0] = dx;
+                uvs[idx * 2 + 1] = dy;
+                colors[idx * 3 + 0] = color.r;
+                colors[idx * 3 + 1] = color.g;
+                colors[idx * 3 + 2] = color.b;
+            }
+
             for (var i = 0; i < spotsCount; i++) {
                 var s = spots[i];
                 colorMap.map(color, s.intensity);
-                var setPoint = function(index, dx, dy) {
-                    var idx = i * 6 + index;
-                    positions[idx * 3 + 0] = s.x + s.r * dx;
-                    positions[idx * 3 + 1] = s.y + s.r * dy;
-                    positions[idx * 3 + 2] = 0;
-                    uvs[idx * 2 + 0] = dx;
-                    uvs[idx * 2 + 1] = dy;
-                    colors[idx * 3 + 0] = color.r;
-                    colors[idx * 3 + 1] = color.g;
-                    colors[idx * 3 + 2] = color.b;
-                }
+
                 setPoint(0, 1, 1);
                 setPoint(1, 1, -1);
                 setPoint(2, -1, -1);
@@ -315,10 +317,10 @@ View2D.prototype = Object.create(null, {
             event.preventDefault();
             event.stopPropagation();
 
-            if (event.wheelDelta > 0) {
+            if (event.deltaY < 0) {
                 this._scale *= View2D.SCALE_CHANGE;
                 this.adjustOffset();
-            } else if (event.wheelDelta < 0) {
+            } else if (event.deltaY > 0) {
                 this._scale /= View2D.SCALE_CHANGE;
                 this.adjustOffset();
             }
@@ -334,8 +336,9 @@ View2D.prototype = Object.create(null, {
             this._spotLabel.hide();
             var point = this.screenToImage({x: event.pageX, y: event.pageY});
             this._scene.findSpot(point).then(function(spot) {
-                if (spot)
+                if (spot) {
                     this._spotLabel.showFor(spot);
+                }
             }.bind(this));
         }
     },
@@ -359,7 +362,7 @@ View2D.MoveMouseAction = function() {
     this._handlers = {
             'mousemove': this._onMouseMove.bind(this),
             'mouseup': this._onMouseUp.bind(this),
-            'mousewheel': this._onMouseWheel.bind(this),
+            'wheel': this._onMouseWheel.bind(this),
     };
 };
 
@@ -382,9 +385,9 @@ View2D.MoveMouseAction.prototype = Object.create(null, {
 
     _onMouseWheel: {
         value: function(event) {
-            if (event.wheelDelta > 0) {
+            if (event.deltaY < 0) {
                 this._onMoveAndScale(event, View2D.SCALE_CHANGE);
-            } else if (event.wheelDelta < 0) {
+            } else if (event.deltaY > 0) {
                 this._onMoveAndScale(event, 1 / View2D.SCALE_CHANGE);
             }
             event.stopPropagation();
@@ -394,10 +397,7 @@ View2D.MoveMouseAction.prototype = Object.create(null, {
 
     _onMoveAndScale: {
         value: function(event, scaleFactor) {
-            this._view.scrollToAndScale(
-                      this._imagePoint,
-                      {x: event.pageX, y: event.pageY},
-                      scaleFactor);
+            this._view.scrollToAndScale(this._imagePoint, {x: event.pageX, y: event.pageY}, scaleFactor);
         }
     },
 
@@ -405,8 +405,7 @@ View2D.MoveMouseAction.prototype = Object.create(null, {
         value: function(view, event) {
             this._view = view;
 
-            this._imagePoint = view.screenToImage(
-                  {x: event.pageX, y: event.pageY});
+            this._imagePoint = view.screenToImage({x: event.pageX, y: event.pageY});
 
             this._view._mouseAction = this;
             for (var i in this._handlers) {
