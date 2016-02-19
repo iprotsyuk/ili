@@ -35,13 +35,8 @@ function Scene3D() {
     document.addEventListener('keypress', this.onKeyPress.bind(this), false);
 };
 
-Scene3D.Events = {
-    CHANGE: 'change',
-};
-
 Scene3D._makeLightProperty = function(field) {
     return Scene3D._makeProxyProperty(field, ['intensity'], function() {
-        //this._notify(Scene3D.Events.CHANGE);
     });
 };
 
@@ -111,7 +106,6 @@ Scene3D.prototype = Object.create(EventSource.prototype, {
             this._color.set(color);
             if (this._mesh) {
                 this._recolor();
-//                this._notify(Scene3D.Events.CHANGE);
             }
         }
     },
@@ -170,7 +164,6 @@ Scene3D.prototype = Object.create(EventSource.prototype, {
             var color = new THREE.Color(value);
             if (color.equals(this._backgroundColor)) return;
             this._backgroundColor.set(color);
-//            this._notify(Scene3D.Events.CHANGE);
         }
     },
 
@@ -192,7 +185,6 @@ Scene3D.prototype = Object.create(EventSource.prototype, {
             this._spotBorder = value;
             if (this._mesh) {
                 this._recolor();
-//                this._notify(Scene3D.Events.CHANGE);
             }
         }
     },
@@ -201,7 +193,6 @@ Scene3D.prototype = Object.create(EventSource.prototype, {
             function() {
         if (this._mesh) {
             this._applyAdjustment();
-            //this._notify(Scene3D.Events.CHANGE);
         }
     }),
 
@@ -250,7 +241,6 @@ Scene3D.prototype = Object.create(EventSource.prototype, {
                     if (this._vrEnabled) {
                         this.updateVrLegend();
                     }
-//                    this._notify(Scene3D.Events.CHANGE);
                 }
             }
         }
@@ -268,7 +258,6 @@ Scene3D.prototype = Object.create(EventSource.prototype, {
                 if (this._vrEnabled) {
                     this.updateVrLegend();
                 }
-//                this._notify(Scene3D.Events.CHANGE);
             }
         }
     },
@@ -283,7 +272,6 @@ Scene3D.prototype = Object.create(EventSource.prototype, {
             this._mapping = value;
             if (this._mesh) {
                 this._recolor();
-//                this._notify(Scene3D.Events.CHANGE);
             }
         }
     },
@@ -312,7 +300,6 @@ Scene3D.prototype = Object.create(EventSource.prototype, {
             } else {
                 this._mesh = null;
             }
-            this._notify(Scene3D.Events.CHANGE);
         }
     },
 
@@ -328,7 +315,6 @@ Scene3D.prototype = Object.create(EventSource.prototype, {
                 if (this._vrEnabled) {
                     this.updateVrLegend();
                 }
-//                this._notify(Scene3D.Events.CHANGE);
             }
         }
     },

@@ -24,7 +24,7 @@ function ViewGroup3D(workspace, div) {
     this._animationFrameRequested = false;
 
     this._scene = workspace.scene3d;
-    this._scene.addEventListener(Scene3D.Events.CHANGE, this.requestAnimationFrame.bind(this));
+    this.requestAnimationFrame();
 
     this._div.addEventListener('mousedown', this._onMouseDown.bind(this));
 
@@ -62,17 +62,12 @@ ViewGroup3D.prototype = Object.create(null, {
             for (var i = 0; i < this._views.length; i++) {
                 var v = this._views[i];
                 if (v.width && v.height) {
-/*                    var viewportBottom = this._height - v.top - v.height;
-                    renderer.setViewport(v.left, viewportBottom, v.width, v.height);
-                    renderer.setScissor(v.left, viewportBottom, v.width, v.height);
-                    renderer.enableScissorTest(true);*/
+                    // without being a child of the scene the camera doesn't work with WebVR
                     if (scene._scene.children.indexOf(v.camera) == -1) {
                         scene._scene.add(v.camera);
                     }
 
                     v.updateCameraPosition();
-//                    v._controls.update();
-
                     scene.render(effect, v.camera);
                 }
             }

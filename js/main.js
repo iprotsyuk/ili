@@ -11,6 +11,7 @@ var g_examples;
 var g_mapSelector;
 var g_isWebkit = navigator.userAgent.toLowerCase().indexOf('webkit') > -1;
 var g_keyPressEvent = g_isWebkit ? 'keydown' : 'keypress';
+var g_voiceController;
 
 /*
  * On load initialization.
@@ -22,6 +23,7 @@ function init() {
             g_workspace,
             $('#map-selector')[0],
             $('#current-map-label')[0]);
+    g_voiceController = new SpeechRecognizer();
 
     initGUI();
     g_examples = new Examples();

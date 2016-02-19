@@ -30,14 +30,12 @@ SpotLabel3D.prototype = Object.create(SpotLabelBase.prototype, asProps({
                 this._view = null;
             }
         }
-        //this._group.requestAnimationFrame();
     },
 
     _onRaycastComplete: function(spot) {
         this._raycastPromise = null;
         this._spot = spot;
         this._changed = true;
-        //this._group.requestAnimationFrame();
     },
 
     update: function() {
