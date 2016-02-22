@@ -15,7 +15,7 @@ function Scene3D() {
         shading: THREE.SmoothShading
     });
 
-    this._vrLegend = new THREE.Mesh(new THREE.PlaneGeometry(5, 2, 1, 1), new THREE.MeshBasicMaterial());
+    this._vrLegend = new THREE.Mesh(new THREE.PlaneGeometry(10, 4, 1, 1), new THREE.MeshBasicMaterial());
 
     this._vrEnabled = false;
     var fullScreenEventName = navigator.userAgent.toLowerCase().indexOf('firefox') > -1 ? 'mozfullscreenchange' : 'webkitfullscreenchange';
@@ -125,14 +125,17 @@ Scene3D.prototype = Object.create(EventSource.prototype, {
             // convert legend from svg to png
             // Source: https://gist.github.com/gustavohenke/9073132
             var legend = document.querySelector("svg.ViewLegend");
+            var legendStyle = window.getComputedStyle(legend);
             // these two attributes below have to be specified explicitly in Firefox
-            legend.setAttribute('width', legend.getBBox().width);
-            legend.setAttribute('height', legend.getBBox().height);
+            var legendWidth = parseInt(legendStyle.getPropertyValue('width'), 10);
+            var legendHeight = parseInt(legendStyle.getPropertyValue('height'), 10);
+            legend.setAttribute('width', legendWidth);
+            legend.setAttribute('height', legendHeight);
             var svgData = (new XMLSerializer()).serializeToString(legend);
 
             var canvas = document.createElement("canvas");
-            canvas.width = legend.getBBox().width;
-            canvas.height = legend.getBBox().height;
+            canvas.width = legendWidth;
+            canvas.height = legendHeight;
             var ctx = canvas.getContext("2d");
 
             var img = document.createElement("img");
@@ -328,18 +331,23 @@ Scene3D.prototype = Object.create(EventSource.prototype, {
     render: {
         value: function(renderer, camera) {
             this._meshContainer.rotation.z += this._autorotation * 0.005;
+            this.updateVrLegendPosition(camera);
 
+            this._frontLight.position.set(camera.position.x, camera.position.y, camera.position.z);
+            renderer.render(this._scene, camera);
+        }
+    },
+
+    updateVrLegendPosition: {
+        value: function(camera) {
             if (this._vrEnabled && camera.children.indexOf(this._vrLegend) == -1) {
                 camera.add(this._vrLegend);
-                this._vrLegend.position.set(-4, -4, -11);
+                this._vrLegend.position.set(-2, -4, -11);
                 this._vrLegend.rotation.x = -0.5;
                 this._vrLegend.rotation.y = 0.5;
             } else if (!this._vrEnabled && camera.children.indexOf(this._vrLegend) != -1) {
                 camera.remove(this._vrLegend);
             }
-
-            this._frontLight.position.set(camera.position.x, camera.position.y, camera.position.z);
-            renderer.render(this._scene, camera);
         }
     },
 
