@@ -18,7 +18,7 @@ function MapSelector(workspace, div, mapName) {
     this._measures = null;
     this._selectedIndex = -1;
     this._div.style.opacity = 0;
-    this._active = false;
+    this._isActive = false;
     this._workspace.addEventListener(
             'intensities-change', this._onWorkspaceIntencitiesChange.bind(this));
     this._input.addEventListener('input', this._onInput.bind(this));
@@ -69,7 +69,7 @@ MapSelector.prototype = Object.create(null, {
 
     activate: {
         value: function() {
-            this._active = true;
+            this._isActive = true;
             var div = this._div;
             div.hidden = false;
             this._input.focus();
@@ -82,7 +82,7 @@ MapSelector.prototype = Object.create(null, {
 
     deactivate: {
         value: function() {
-            this._active = false;
+            this._isActive = false;
             var div = this._div;
             div.style.opacity = 0;
             this._effect(200).then(function() {
@@ -93,7 +93,7 @@ MapSelector.prototype = Object.create(null, {
 
     blink: {
         value: function() {
-            if (this._active) return;
+            if (this._isActive) return;
             var div = this._div;
             div.hidden = false;
             this._effect(0).then(function() {

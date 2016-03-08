@@ -12,17 +12,18 @@
   <script src="js/lib/three.js"></script>
   <script src="js/lib/FileSaver.min.js"></script>
   <script src="js/lib/OrbitControls.js"></script>
+  <script src="js/lib/webvr-polyfill.js"></script>
   <script src="js/lib/VREffect.js"></script>
   <script src="js/lib/VRControls.js"></script>
   <script src="js/lib/audioRecorder.js"></script>
   <script src="js/lib/callbackManager.js"></script>
   <script src="js/common.js"></script>
+  <script src="js/CommandProcessor.js"></script>
   <script src="js/EventSource.js"></script>
   <script src="js/ColorMaps.js"></script>
   <script src="js/MapSelector.js"></script>
   <script src="js/Scene2D.js"></script>
   <script src="js/Scene3D.js"></script>
-  <script src="js/SpeechRecognizer.js"></script>
   <script src="js/SpotLabelBase.js"></script>
   <script src="js/SpotLabel2D.js"></script>
   <script src="js/SpotLabel3D.js"></script>
@@ -31,6 +32,7 @@
   <script src="js/ViewContainer.js"></script>
   <script src="js/ViewGroup3D.js"></script>
   <script src="js/ViewLegend.js"></script>
+  <script src="js/VoiceControls.js"></script>
   <script src="js/Workspace.js"></script>
   <script src="js/Examples.js"></script>
   <script src="js/main.js"></script>
@@ -69,6 +71,7 @@
   <text id="maxLabel" x="190" y="70" fill="black" text-anchor="end" font-size="14" />
 </svg>
 </div>
+<div id="voice-control-indicator" class="vc-default"></div>
 <div id="examples-container"></div>
 <div id="status" hidden></div>
 <div id="map-selector" hidden><input type="text" autocomplete="off"><div class="items"></div></div>

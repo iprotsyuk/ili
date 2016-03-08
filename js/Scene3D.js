@@ -15,7 +15,7 @@ function Scene3D() {
         shading: THREE.SmoothShading
     });
 
-    this._vrLegend = new THREE.Mesh(new THREE.PlaneGeometry(10, 4, 1, 1), new THREE.MeshBasicMaterial());
+    this._vrLegend = new THREE.Mesh(new THREE.PlaneGeometry(5, 2, 1, 1), new THREE.MeshBasicMaterial());
 
     this._vrEnabled = false;
     var fullScreenEventName = navigator.userAgent.toLowerCase().indexOf('firefox') > -1 ? 'mozfullscreenchange' : 'webkitfullscreenchange';
@@ -29,6 +29,7 @@ function Scene3D() {
     this._spots = null;
     this._mapping = null;
 
+//    this._scene.add(new THREE.AxisHelper(20));
     this._scene.add(this._meshContainer);
     this._scene.add(this._frontLight);
 
@@ -342,7 +343,7 @@ Scene3D.prototype = Object.create(EventSource.prototype, {
         value: function(camera) {
             if (this._vrEnabled && camera.children.indexOf(this._vrLegend) == -1) {
                 camera.add(this._vrLegend);
-                this._vrLegend.position.set(-2, -4, -11);
+                this._vrLegend.position.set(-1, -2, -5);
                 this._vrLegend.rotation.x = -0.5;
                 this._vrLegend.rotation.y = 0.5;
             } else if (!this._vrEnabled && camera.children.indexOf(this._vrLegend) != -1) {

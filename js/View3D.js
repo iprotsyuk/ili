@@ -18,9 +18,8 @@ function View3D(group, div) {
     this._height = 0;
     this._autorotation = 0;
     this._autorotationStart = undefined;
-    this._camera = new THREE.PerspectiveCamera(90, this._div.offsetWidth / this._div.offsetHeight, 0.1, 1000);
-    this._cameraOffset = new THREE.Vector3(0, 20, 30);
-    this._camera.position.copy(this._cameraOffset);
+    this._camera = new THREE.PerspectiveCamera(90, this._div.offsetWidth / this._div.offsetHeight, 0.001, 1000000);
+    this._camera.position.copy(new THREE.Vector3(0, 20, 30));
     this._camera.lookAt(this._group._scene.position);
 
     /*
@@ -28,7 +27,8 @@ function View3D(group, div) {
      */
     window.addEventListener('resize', this.onWindowResize.bind(this), false);
 
-    this._vrControls = new THREE.VRControls(this._camera, function(message){
+    this._dollyVrCamera = new THREE.Object3D();
+    this._vrControls = new THREE.VRControls(this._dollyVrCamera, function(message){
         console.log(message);
     });
     this._vrControls.scale = 50;
@@ -83,8 +83,26 @@ View3D.prototype = Object.create(null, {
 
     updateCameraPosition: {
         value: function() {
+            var initialVrPosition = new THREE.Vector3();
+            initialVrPosition.copy(this._dollyVrCamera.position);
+            var initialVrRotation = new THREE.Euler();
+            initialVrRotation.copy(this._dollyVrCamera.rotation);
+
+            var vrPositionShift = new THREE.Vector3();
+            var vrRotationShift = new THREE.Euler();
+
             this._vrControls.update();
-            this._camera.position.add(this._cameraOffset);
+
+            vrPositionShift.subVectors(this._dollyVrCamera.position, initialVrPosition);
+            vrRotationShift.x = this._dollyVrCamera.rotation.x - initialVrRotation.x;
+            vrRotationShift.y = this._dollyVrCamera.rotation.y - initialVrRotation.y;
+            vrRotationShift.z = this._dollyVrCamera.rotation.z - initialVrRotation.z;
+
+            this.camera.position.add(vrPositionShift);
+
+            this.camera.rotation.x += vrRotationShift.x;
+            this.camera.rotation.y += vrRotationShift.y;
+            this.camera.rotation.z += vrRotationShift.z;
         }
     },
 

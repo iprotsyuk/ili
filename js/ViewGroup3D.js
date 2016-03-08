@@ -33,7 +33,7 @@ function ViewGroup3D(workspace, div) {
     });
     this._effect.setSize( window.innerWidth, window.innerHeight );
 
-    document.body.addEventListener( 'dblclick', this.onDoubleClick.bind(this));
+    document.body.addEventListener('dblclick', this.enterVr.bind(this));
 
     window.addEventListener('resize', function() {
         this._effect.setSize(window.innerWidth, window.innerHeight);
@@ -44,6 +44,8 @@ function ViewGroup3D(workspace, div) {
         this._views.push(new View3D(this, divs[i]));
     }
     this._spotLabel = new SpotLabel3D(this, this._scene);
+
+    this._voiceControls = new VoiceControls(this._views[0]._camera, this._scene.position);
 }
 
 ViewGroup3D.prototype = Object.create(null, {
@@ -68,15 +70,29 @@ ViewGroup3D.prototype = Object.create(null, {
                     }
 
                     v.updateCameraPosition();
-                    scene.render(effect, v.camera);
+                    this._voiceControls.update();
+                    scene.render(scene._vrEnabled ? effect : renderer, v.camera);
                 }
             }
         }
     },
 
-    onDoubleClick: {
+    enterVr: {
         value: function() {
-            this._effect.setFullScreen(true);
+            if (this._scene.geometry !== null) {
+                var canvas = this._renderer.domElement;
+                if (window.isMobileBrowser === false) {
+                    this._effect.setFullScreen(true);
+                } else if (canvas.requestFullscreen) {
+                    canvas.requestFullscreen();
+                } else if (canvas.mozRequestFullScreen) {
+                    canvas.mozRequestFullScreen();
+                } else if (canvas.webkitRequestFullscreen) {
+                    canvas.webkitRequestFullscreen();
+                } else {
+                    console.log('Unable to detect browser type to request full-screen mode');
+                }
+            }
         }
     },
 

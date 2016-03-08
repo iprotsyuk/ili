@@ -9,10 +9,9 @@ var g_views;
 var g_gui;
 var g_examples;
 var g_mapSelector;
+
 var g_isWebkit = navigator.userAgent.toLowerCase().indexOf('webkit') > -1;
 var g_keyPressEvent = g_isWebkit ? 'keydown' : 'keypress';
-var g_voiceController;
-
 /*
  * On load initialization.
  */
@@ -23,7 +22,6 @@ function init() {
             g_workspace,
             $('#map-selector')[0],
             $('#current-map-label')[0]);
-    g_voiceController = new SpeechRecognizer();
 
     initGUI();
     g_examples = new Examples();
@@ -150,6 +148,7 @@ function initGUI() {
     f3d.add(g_workspace.scene3d.frontLight, 'intensity', 0, 3).name('Light');
     f3d.add(g_workspace.scene3d, 'spotBorder', 0, 1).name('Spot border').step(0.01);
     f3d.add(g_views, 'exportPixelRatio3d', [0.5, 1.0, 2.0, 4.0]).name('Export pixel ratio');
+    f3d.add(g_views.g3d, 'enterVr').name('Enter VR');
     var adjustment = f3d.addFolder('Adjustment');
     adjustment.add(g_workspace.scene3d.adjustment, 'alpha', -180.0, 180.0).name('0X rotation').step(1);
     adjustment.add(g_workspace.scene3d.adjustment, 'beta', -180.0, 180.0).name('0Y rotation').step(1);
