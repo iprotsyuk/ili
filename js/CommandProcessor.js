@@ -11,7 +11,7 @@ function CommandProcessor(object, target) {
     this._lastCommandPersists = false;
 
     this._rotationAngleStep = 0.01;
-    this._zoomStep = 0.05;
+    this._zoomStep = 0.01;
 
     this._transitionDictionary = {};
     for (var i = 0; i < CommandProcessor.grammar.g.transitions.length; ++i) {
@@ -150,8 +150,12 @@ CommandProcessor.prototype = Object.create(null, {
             if (phrase.length === 0) {
                 return false;
             }
-            var lastWord = phrase[phrase.length - 1].word;
-            return (lastWord in this._transitionDictionary) && this._transitionDictionary[lastWord].to == 0;
+            var lastWordIndex = phrase.length;
+            var lastWord = '';
+            do {
+                lastWord = phrase[--lastWordIndex].word;
+            } while (lastWord === '<sil>' && lastWordIndex > 0);
+            return (lastWord in this._transitionDictionary) && this._transitionDictionary[lastWord].to === 0;
         }
     },
 
