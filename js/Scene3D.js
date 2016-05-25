@@ -24,7 +24,7 @@ function Scene3D() {
     this._spotBorder = 0.05;
     this._colorMap = null;
     this._adjustment = {x: 0, y: 0, z: 0, alpha: 0, beta: 0, gamma: 0};
-    this._autorotation = 0;
+    this._autorotation = 1;
 
     this._spots = null;
     this._mapping = null;
@@ -331,7 +331,9 @@ Scene3D.prototype = Object.create(EventSource.prototype, {
 
     render: {
         value: function(renderer, camera) {
-            this._meshContainer.rotation.z += this._autorotation * 0.005;
+            var localUp = new THREE.Vector3(0, 1, 0);
+            localUp = this._meshContainer.worldToLocal(localUp.add(this._meshContainer.position));
+            this._meshContainer.rotateOnAxis(localUp, this._autorotation * 0.005);
             this.updateVrLegendPosition(camera);
 
             this._frontLight.position.set(camera.position.x, camera.position.y, camera.position.z);
@@ -343,7 +345,7 @@ Scene3D.prototype = Object.create(EventSource.prototype, {
         value: function(camera) {
             if (this._vrEnabled && camera.children.indexOf(this._vrLegend) == -1) {
                 camera.add(this._vrLegend);
-                this._vrLegend.position.set(-1, -2, -5);
+                this._vrLegend.position.set(-1, -2, -7);
                 this._vrLegend.rotation.x = -0.5;
                 this._vrLegend.rotation.y = 0.5;
             } else if (!this._vrEnabled && camera.children.indexOf(this._vrLegend) != -1) {

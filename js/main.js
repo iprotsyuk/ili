@@ -137,12 +137,12 @@ function initGUI() {
     f2d.add(g_workspace.scene2d, 'spotBorder', 0, 1).name('Spot border').step(0.01);
 
     var f3d = g_gui.addFolder('3D');
-    f3d.add(g_views.g3d, 'layout', {
+/*    f3d.add(g_views.g3d, 'layout', {
         'Single view': ViewGroup3D.Layout.SINGLE,
         'Double view': ViewGroup3D.Layout.DOUBLE,
         'Triple view': ViewGroup3D.Layout.TRIPLE,
         'Quadriple view': ViewGroup3D.Layout.QUADRIPLE,
-    }).name('Layout');
+    }).name('Layout');*/
     f3d.addColor(g_workspace.scene3d, 'color').name('Color');
     f3d.addColor(g_workspace.scene3d, 'backgroundColor').name('Background');
     f3d.add(g_workspace.scene3d.frontLight, 'intensity', 0, 3).name('Light');

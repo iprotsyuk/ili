@@ -25,51 +25,63 @@ function Examples() {
     };
     var items = [
         {
-            name: '3D-MASSOMICS meeting mockup',
-            files: ['3dmassomics/bg.png', '3dmassomics/intensities.csv'],
+            name: 'Laptop',
+            files: ['laptop/Air.stl', 'laptop/intensities.csv'],
+            adjustView: function() {
+                g_workspace.scene3d.adjustment.alpha = 0;
+                g_workspace.scene3d.adjustment.beta = -160;
+                g_workspace.scene3d.adjustment.gamma = 0;
+                g_workspace.scene3d.adjustment.x = 7;
+                g_workspace.scene3d.adjustment.y = 8;
+                g_workspace.scene3d.adjustment.z = 3;
+
+                g_workspace.scaleId = Workspace.Scale.LINEAR.id;
+                g_workspace.colorMapId = 'VIRIDIS';
+            }
         },
         {
-            name: 'Stingless bee',
-            files: ['bee/model.stl', 'bee/intensities.csv'],
+            name: 'Human skin metabolome (female)',
+            files: ['female/woman.stl', 'female/intensities.csv'],
             adjustView: function() {
                 g_workspace.scene3d.adjustment.alpha = -90;
-                g_workspace.scene3d.adjustment.beta = 10;
-                g_workspace.scene3d.adjustment.gamma = 0;
-                g_workspace.scene3d.adjustment.x = 0;
-                g_workspace.scene3d.adjustment.y = 0;
-                g_workspace.scene3d.adjustment.z = 0;
+                g_workspace.scene3d.adjustment.beta = 0;
+                g_workspace.scene3d.adjustment.gamma = 35;
+                g_workspace.scene3d.adjustment.x = -3;
+                g_workspace.scene3d.adjustment.y = -12;
+                g_workspace.scene3d.adjustment.z = 10;
 
-                g_workspace.scaleId = Workspace.Scale.LOG.id;
-                g_workspace.colorMapId = 'VIRIDIS';
-            }
-        },
-        {
-            name: 'Diseased coral',
-            files: ['coral/bg.png', 'coral/intensities.csv'],
-            adjustView: function() {
-                g_workspace.colorMapId = 'VIRIDIS';
-            }
-        },
-        {
-            name: 'Cyanobacteria natural products',
-            files: ['cyano/bg.png', 'cyano/intensities.csv'],
-            adjustView: function() {
-                g_workspace.scaleId = Workspace.Scale.LOG.id;
+                g_workspace.scaleId = Workspace.Scale.LINEAR.id;
                 g_workspace.colorMapId = 'JET';
             }
         },
         {
-            name: 'Human skin metabolome',
-            files: ['human/man.stl', 'human/man_LCMS_small.csv'],
+            name: 'Human skin metabolome (male)',
+            files: ['male/man.stl', 'male/intensities.csv'],
             adjustView: function() {
-                g_workspace.colorMapId = 'VIRIDIS';
-
                 g_workspace.scene3d.adjustment.alpha = -90;
                 g_workspace.scene3d.adjustment.beta = 0;
-                g_workspace.scene3d.adjustment.gamma = -45;
-                g_workspace.scene3d.adjustment.x = 0;
-                g_workspace.scene3d.adjustment.y = -13;
-                g_workspace.scene3d.adjustment.z = 0;
+                g_workspace.scene3d.adjustment.gamma = 35;
+                g_workspace.scene3d.adjustment.x = -6;
+                g_workspace.scene3d.adjustment.y = -11;
+                g_workspace.scene3d.adjustment.z = 15;
+
+                g_workspace.scaleId = Workspace.Scale.LINEAR.id;
+                g_workspace.colorMapId = 'JET';
+            }
+        },
+        {
+            name: 'Built environment',
+            files: ['office/office.stl', 'office/intensities.csv'],
+            adjustView: function() {
+                g_workspace.scene3d.adjustment.alpha = -180;
+                g_workspace.scene3d.adjustment.beta = -20;
+                g_workspace.scene3d.adjustment.gamma = 0;
+                g_workspace.scene3d.adjustment.x = -0.2;
+                g_workspace.scene3d.adjustment.y = 19;
+                g_workspace.scene3d.adjustment.z = 28.2;
+
+                g_workspace.scaleId = Workspace.Scale.LINEAR.id;
+                g_workspace.colorMapId = 'VIRIDIS';
             }
         }
     ];

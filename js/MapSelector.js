@@ -72,8 +72,8 @@ MapSelector.prototype = Object.create(null, {
             this._isActive = true;
             var div = this._div;
             div.hidden = false;
-            this._input.focus();
-            this._input.select();
+//            this._input.focus();
+//            this._input.select();
             this._effect(0).then(function() {
                 div.style.opacity = 1;
             });

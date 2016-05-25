@@ -45,7 +45,7 @@ function ViewGroup3D(workspace, div) {
     }
     this._spotLabel = new SpotLabel3D(this, this._scene);
 
-    this._voiceControls = new VoiceControls(this._views[0]._camera, this._scene.position);
+//    this._voiceControls = new VoiceControls(this._views[0]._camera, this._scene.position);
 }
 
 ViewGroup3D.prototype = Object.create(null, {
@@ -70,7 +70,7 @@ ViewGroup3D.prototype = Object.create(null, {
                     }
 
                     v.updateCameraPosition();
-                    this._voiceControls.update();
+//                    this._voiceControls.update();
                     scene.render(scene._vrEnabled ? effect : renderer, v.camera);
                 }
             }
